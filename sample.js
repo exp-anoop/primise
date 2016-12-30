@@ -1,75 +1,69 @@
-// Creatred by Anoop P R
-
-
-// Changes made in develop branch
-
-// Changes made
-
-
-var cleanRoom = function() {
-    return new Promise(function(resolve, reject) {
-        // Code 
-        var isClean = true; // 1 , 2, 3
-
-        if (isClean == 1) {
-            resolve("today")
-        } if (isClean == 2) {
-            resolve("tomorrow")
-        } else {
-            reject("room : failed");
-        }
-
-    });
+ 
+function User()
+{
+    this.validateUser=function(user,pass)
+    {
+        this.user=user;
+        this.pass=pass;
+        var httpObj=new XMLHttpRequest();
+        return new Promise (function(resolve, reject){
+            httpObj.onreadystatechange=function()
+            {
+                console.log(this.readyState);
+                if(this.readyState=='4'&& this.status=='200')
+                {
+                    var result=this.responseText;
+                    result=JSON.parse(result);
+                    if(result.status=='200')
+                    {
+                        resolve(result.message);
+                    }
+                    else
+                    {
+                        reject(result.message);
+                    }
+                }
+            }
+            httpObj.open('POST','https://exptest.herokuapp.com/api/login',true);
+            httpObj.setRequestHeader('content-type','application/x-www-form-urlencoded');
+            httpObj.send('userName='+user+'&password='+pass);
+        });         
+    }
 }
 
-
-var garbage = function() {
-    return new Promise(function(resolve, reject) {
-
-        // Code
-
-        var out = false;
-
-        if (out) {
-            resolve(1,2,3)
-        } else {
-            reject('garbage : failed');
+function Home()
+{
+    this.loadContent=function()
+    {
+        var httpObj=new XMLHttpRequest();
+        httpObj.onreadystatechange=function()
+        {
+            if(this.readyState=='4'&& this.status=='200')
+            {
+                var result=this.responseText;
+                result=JSON.parse(result);
+                result.data.forEach(function(element){  
+                console.log(element.imageUrl); });
+            }
         }
-    })
-
+        httpObj.open('GET','https://exptest.herokuapp.com/api/imageGallery',true);
+        httpObj.send();
+    }
 }
 
-var buyIceCream = function() {
-    return new Promise(function(resolve, reject) {
+var obj=new User();
+validate();
+function validate()
+        {
+            obj.validateUser("demo@experionglobal.com","exp@123")
+            .then(function(data){
+                console.log(data);
+                var ob=new Home();
+                ob.loadContent();
 
-        // Code
+                })
+            .catch(function(data) {
+                console.log(data);
+            });
 
-        var ice = true;
-
-        if (ice) {
-            resolve()
-        } else {
-            reject('ice failed');
         }
-    })
-
-}
-
-
-cleanRoom()
-    .then(function(data) {
-
-    	console.log("Clean " + data);
-
-        return garbage();
-
-    })
-    .then(function(one, two, three) {
-        return buyIceCream();
-    })
-    .then(function() {
-            console.log("Happy");
-	    })
-	.catch(function(error) {
-	    console.log("failed due to "  + error);
-	});
